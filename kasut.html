@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Senarai Customer · Sistem Pembelian Kasut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Senarai Customer</h1>
+          <p>Urus maklumat pelanggan sistem</p>
+        </div>
+      </div>
+
+      <div id="flashBox" class="flash"></div>
+
+      <div class="panel">
+        <h2>Tambah Customer Baharu</h2>
+        <form id="formCustomer" class="form-grid">
+          <div>
+            <label>Nama Penuh</label>
+            <input type="text" id="nama" placeholder="cth: Ali bin Ahmad" required />
+          </div>
+          <div>
+            <label>No. Telefon</label>
+            <input type="text" id="no_telefon" placeholder="012-3456789" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" id="email" placeholder="nama@email.com" />
+          </div>
+          <div>
+            <label>Alamat</label>
+            <input type="text" id="alamat" placeholder="Bandar, Negeri" />
+          </div>
+          <div>
+            <button type="submit" class="btn">+ Tambah Customer</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Senarai Customer (<span id="jumlahCustomer">0</span>)</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Nama</th><th>No. Telefon</th><th>Email</th><th>Alamat</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody id="tblCustomer"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    const session = kkRequireLogin();
+    if (session) {
+      kkRenderSidebar('customers');
+
+      function renderTable() {
+        const customer = kkGet(DB_KEYS.customer).sort((a, b) => b.id - a.id);
+        document.getElementById('jumlahCustomer').textContent = customer.length;
+        const tbody = document.getElementById('tblCustomer');
+        if (customer.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--grey);padding:20px;">Tiada customer lagi.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = customer.map(c => `
+          <tr>
+            <td>#${c.id}</td>
+            <td>${kkEscape(c.nama)}</td>
+            <td>${kkEscape(c.no_telefon) || '-'}</td>
+            <td>${kkEscape(c.email) || '-'}</td>
+            <td>${kkEscape(c.alamat) || '-'}</td>
+            <td class="actions">
+              <button type="button" class="btn danger" data-id="${c.id}" onclick="hapusCustomer(${c.id})">Padam</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      window.hapusCustomer = function (id) {
+        if (!confirm('Padam customer ini?')) return;
+        let customer = kkGet(DB_KEYS.customer);
+        customer = customer.filter(c => c.id !== id);
+        kkSet(DB_KEYS.customer, customer);
+        kkShowFlash('Customer telah dipadam.', 'success');
+        renderTable();
+      };
+
+      document.getElementById('formCustomer').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const customer = kkGet(DB_KEYS.customer);
+        const newCustomer = {
+          id: kkNextId(customer),
+          nama: document.getElementById('nama').value.trim(),
+          no_telefon: document.getElementById('no_telefon').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          alamat: document.getElementById('alamat').value.trim()
+        };
+        customer.push(newCustomer);
+        kkSet(DB_KEYS.customer, customer);
+        kkShowFlash('Customer berjaya ditambah.', 'success');
+        e.target.reset();
+        renderTable();
+      });
+
+      renderTable();
+    }
+  </script>
+</body>
+</html>

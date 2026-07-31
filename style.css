@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Senarai Vendor · Sistem Pembelian Kasut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Senarai Vendor</h1>
+          <p>Urus maklumat pembekal kasut</p>
+        </div>
+      </div>
+
+      <div id="flashBox" class="flash"></div>
+
+      <div class="panel">
+        <h2>Tambah Vendor Baharu</h2>
+        <form id="formVendor" class="form-grid">
+          <div>
+            <label>Nama Vendor</label>
+            <input type="text" id="nama_vendor" placeholder="cth: Nike Malaysia Sdn Bhd" required />
+          </div>
+          <div>
+            <label>No. Telefon</label>
+            <input type="text" id="no_telefon" placeholder="03-1234 5678" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" id="email" placeholder="sales@vendor.com" />
+          </div>
+          <div>
+            <label>Alamat</label>
+            <input type="text" id="alamat" placeholder="Bandar, Negeri" />
+          </div>
+          <div>
+            <button type="submit" class="btn">+ Tambah Vendor</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Senarai Vendor (<span id="jumlahVendor">0</span>)</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Nama Vendor</th><th>No. Telefon</th><th>Email</th><th>Alamat</th><th>Bilangan Kasut</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody id="tblVendor"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    const session = kkRequireLogin();
+    if (session) {
+      kkRenderSidebar('vendors');
+
+      function renderTable() {
+        const vendor = kkGet(DB_KEYS.vendor).sort((a, b) => b.id - a.id);
+        const kasut = kkGet(DB_KEYS.kasut);
+        document.getElementById('jumlahVendor').textContent = vendor.length;
+        const tbody = document.getElementById('tblVendor');
+        if (vendor.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--grey);padding:20px;">Tiada vendor lagi.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = vendor.map(v => {
+          const jumlahKasut = kasut.filter(k => k.vendor_id === v.id).length;
+          return `<tr>
+            <td>#${v.id}</td>
+            <td>${kkEscape(v.nama_vendor)}</td>
+            <td>${kkEscape(v.no_telefon) || '-'}</td>
+            <td>${kkEscape(v.email) || '-'}</td>
+            <td>${kkEscape(v.alamat) || '-'}</td>
+            <td><span class="badge">${jumlahKasut} jenis</span></td>
+            <td class="actions">
+              <button type="button" class="btn danger" onclick="hapusVendor(${v.id})">Padam</button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+
+      window.hapusVendor = function (id) {
+        if (!confirm('Padam vendor ini?')) return;
+        let vendor = kkGet(DB_KEYS.vendor);
+        vendor = vendor.filter(v => v.id !== id);
+        kkSet(DB_KEYS.vendor, vendor);
+        kkShowFlash('Vendor telah dipadam.', 'success');
+        renderTable();
+      };
+
+      document.getElementById('formVendor').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const vendor = kkGet(DB_KEYS.vendor);
+        const newVendor = {
+          id: kkNextId(vendor),
+          nama_vendor: document.getElementById('nama_vendor').value.trim(),
+          no_telefon: document.getElementById('no_telefon').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          alamat: document.getElementById('alamat').value.trim()
+        };
+        vendor.push(newVendor);
+        kkSet(DB_KEYS.vendor, vendor);
+        kkShowFlash('Vendor berjaya ditambah.', 'success');
+        e.target.reset();
+        renderTable();
+      });
+
+      renderTable();
+    }
+  </script>
+</body>
+</html>

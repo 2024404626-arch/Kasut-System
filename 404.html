@@ -1,0 +1,100 @@
+# 👟 Sistem Pembelian Kasut (KasutKita) — Versi HTML Statik
+
+Versi **HTML/CSS/JavaScript tulen** (tiada backend/server, tiada pangkalan data luar) bagi Sistem Pengurusan Pembelian Kasut. Semua data disimpan dalam **localStorage** pelayar. Sesuai untuk **GitHub Pages**, portfolio, atau demo assignment tanpa perlu setup server langsung.
+
+## 🌐 Demo Langsung
+
+Selepas publish ke GitHub Pages, laman anda akan berada di:
+```
+https://USERNAME.github.io/NAMA-REPO/
+```
+
+## ✨ Ciri-ciri
+
+- 🔐 **Staff Login** — sistem log masuk staff (session tersimpan dalam `sessionStorage`)
+- 👥 **Senarai Customer** — tambah & padam maklumat pelanggan
+- 👟 **Jenis Kasut** — urus brand, model, saiz, harga & stok, dikaitkan dengan vendor
+- 🏭 **Senarai Vendor** — urus maklumat pembekal kasut
+- 💳 **Proses Pembayaran** — pilih customer + kasut + kuantiti + kaedah bayaran → stok automatik ditolak, resit dijana & boleh dicetak
+- 📊 **Dashboard** — ringkasan statistik keseluruhan sistem
+- 🌱 **Data Contoh** — dimuatkan automatik pada kali pertama laman dibuka
+- ↺ **Reset Data** — butang di Dashboard untuk kembalikan data ke keadaan asal
+
+## 🛠️ Teknologi
+
+Hanya **HTML5 + CSS3 + Vanilla JavaScript (ES6)**. Tiada framework, tiada `npm install`, tiada langkah build. Buka terus dalam pelayar atau publish ke GitHub Pages.
+
+## 📁 Struktur Projek
+
+```
+kasut-html/
+├── index.html         # Halaman log masuk
+├── dashboard.html      # Ringkasan statistik
+├── customers.html       # Senarai customer
+├── kasut.html            # Jenis kasut (brand, harga, saiz)
+├── vendors.html           # Senarai vendor
+├── pembelian.html          # Proses pembayaran & sejarah transaksi
+├── resit.html                # Resit pembayaran
+├── 404.html                   # Halaman ralat GitHub Pages
+├── css/
+│   └── style.css
+└── js/
+    └── data.js         # Lapisan data (localStorage) + logik seed & auth
+```
+
+## 🚀 Cara Menjalankan Secara Tempatan
+
+Tiada instalasi diperlukan — buka sahaja `index.html` dalam pelayar:
+
+```bash
+# Cara 1: buka terus
+open index.html          # macOS
+start index.html         # Windows
+
+# Cara 2 (disyorkan): guna local server ringkas supaya semua laluan berfungsi betul
+python3 -m http.server 8080
+# kemudian buka http://localhost:8080
+```
+
+**Akaun Staff (untuk login):**
+
+| Username | Kata Laluan | Jawatan |
+|---|---|---|
+| `admin` | `admin123` | Pengurus |
+| `siti` | `siti123` | Staff Jualan |
+
+## 📤 Cara Publish ke GitHub Pages
+
+1. Cipta repo baharu di GitHub, contohnya `sistem-pembelian-kasut`
+2. Push semua fail dalam folder ini ke repo:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit: Sistem Pembelian Kasut (HTML statik)"
+   git branch -M main
+   git remote add origin https://github.com/USERNAME/sistem-pembelian-kasut.git
+   git push -u origin main
+   ```
+3. Di GitHub, pergi ke **Settings → Pages**
+4. Bawah **Build and deployment**, pilih **Source: Deploy from a branch**
+5. Pilih **Branch: main**, folder **/ (root)** → **Save**
+6. Tunggu 1-2 minit, laman akan aktif di `https://USERNAME.github.io/NAMA-REPO/`
+
+## 🧭 Panduan Penggunaan
+
+1. **Log masuk** dengan salah satu akaun staff di atas
+2. **Senarai Vendor** → tambah pembekal kasut
+3. **Jenis Kasut** → tambah kasut (brand, model, saiz, harga, stok), kaitkan dengan vendor
+4. **Senarai Customer** → daftarkan pelanggan
+5. **Proses Pembayaran** → pilih customer + kasut + kuantiti + kaedah bayaran → sistem kira jumlah, tolak stok, & jana resit boleh cetak
+
+## ⚠️ Nota Penting
+
+- **Data hanya disimpan pada pelayar & peranti semasa** (localStorage). Buka laman di peranti/pelayar lain = data seed baharu, tiada perkongsian data antara pengguna.
+- Kata laluan disimpan **tanpa penyulitan** dalam localStorage (sesuai untuk demo/pembelajaran sahaja — **bukan** untuk kegunaan produksi sebenar).
+- Kalau nak sistem sebenar dengan pangkalan data + backend selamat, rujuk **versi Node.js/Express** projek ini (ada di repo/folder berasingan).
+- Klik **"↺ Reset ke Data Contoh"** di Dashboard untuk kembalikan semua data ke keadaan asal bila-bila masa.
+
+## 📄 Lesen
+
+MIT License — bebas guna & ubah suai untuk tujuan pembelajaran.

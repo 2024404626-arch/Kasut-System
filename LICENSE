@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log Masuk Staff · Sistem Pembelian Kasut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="icon">👟</div>
+        <h1>KasutKita</h1>
+      </div>
+      <p class="sub">Log masuk staff untuk mengurus sistem pembelian kasut</p>
+
+      <div id="flashBox" class="flash error"></div>
+
+      <form id="loginForm">
+        <div style="margin-bottom:16px;">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="cth: admin" required autofocus />
+        </div>
+        <div style="margin-bottom:20px;">
+          <label for="password">Kata Laluan</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn" style="width:100%;">Log Masuk</button>
+      </form>
+
+      <div class="login-hint">
+        <strong>Akaun contoh:</strong><br />
+        Username: <code>admin</code> · Kata laluan: <code>admin123</code><br />
+        Username: <code>siti</code> · Kata laluan: <code>siti123</code>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    kkSeedIfNeeded();
+    // Jika staff dah login, terus ke dashboard
+    if (kkSession()) window.location.href = 'dashboard.html';
+
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const session = kkLogin(username, password);
+      if (session) {
+        window.location.href = 'dashboard.html';
+      } else {
+        kkShowFlash('Username atau kata laluan tidak sah.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

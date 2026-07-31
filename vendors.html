@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jenis Kasut · Sistem Pembelian Kasut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Jenis Kasut</h1>
+          <p>Urus brand, harga, saiz dan stok kasut</p>
+        </div>
+      </div>
+
+      <div id="flashBox" class="flash"></div>
+
+      <div class="panel">
+        <h2>Tambah Jenis Kasut Baharu</h2>
+        <form id="formKasut" class="form-grid">
+          <div>
+            <label>Brand</label>
+            <input type="text" id="brand" placeholder="cth: Nike" required />
+          </div>
+          <div>
+            <label>Model</label>
+            <input type="text" id="model" placeholder="cth: Air Max 270" />
+          </div>
+          <div>
+            <label>Saiz</label>
+            <input type="text" id="saiz" placeholder="cth: 9" required />
+          </div>
+          <div>
+            <label>Harga (RM)</label>
+            <input type="number" step="0.01" id="harga" placeholder="199.00" required />
+          </div>
+          <div>
+            <label>Stok</label>
+            <input type="number" id="stok" placeholder="20" value="0" />
+          </div>
+          <div>
+            <label>Vendor</label>
+            <select id="vendor_id">
+              <option value="">- Pilih Vendor -</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn">+ Tambah Kasut</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Senarai Kasut (<span id="jumlahKasut">0</span>)</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Brand</th><th>Model</th><th>Saiz</th><th>Harga</th><th>Stok</th><th>Vendor</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody id="tblKasut"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    const session = kkRequireLogin();
+    if (session) {
+      kkRenderSidebar('kasut');
+
+      function isiVendorDropdown() {
+        const vendor = kkGet(DB_KEYS.vendor);
+        const select = document.getElementById('vendor_id');
+        select.innerHTML = '<option value="">- Pilih Vendor -</option>' +
+          vendor.map(v => `<option value="${v.id}">${kkEscape(v.nama_vendor)}</option>`).join('');
+      }
+
+      function renderTable() {
+        const kasut = kkGet(DB_KEYS.kasut).sort((a, b) => b.id - a.id);
+        const vendor = kkGet(DB_KEYS.vendor);
+        document.getElementById('jumlahKasut').textContent = kasut.length;
+        const tbody = document.getElementById('tblKasut');
+        if (kasut.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--grey);padding:20px;">Tiada kasut lagi.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = kasut.map(k => {
+          const v = vendor.find(x => x.id === k.vendor_id);
+          return `<tr>
+            <td>#${k.id}</td>
+            <td>${kkEscape(k.brand)}</td>
+            <td>${kkEscape(k.model) || '-'}</td>
+            <td>${kkEscape(k.saiz)}</td>
+            <td>${kkFormatRM(k.harga)}</td>
+            <td><span class="badge ${k.stok <= 5 ? 'low' : ''}">${k.stok} unit</span></td>
+            <td>${v ? kkEscape(v.nama_vendor) : '-'}</td>
+            <td class="actions">
+              <button type="button" class="btn danger" onclick="hapusKasut(${k.id})">Padam</button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+
+      window.hapusKasut = function (id) {
+        if (!confirm('Padam kasut ini?')) return;
+        let kasut = kkGet(DB_KEYS.kasut);
+        kasut = kasut.filter(k => k.id !== id);
+        kkSet(DB_KEYS.kasut, kasut);
+        kkShowFlash('Kasut telah dipadam.', 'success');
+        renderTable();
+      };
+
+      document.getElementById('formKasut').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const kasut = kkGet(DB_KEYS.kasut);
+        const vendorId = document.getElementById('vendor_id').value;
+        const newKasut = {
+          id: kkNextId(kasut),
+          brand: document.getElementById('brand').value.trim(),
+          model: document.getElementById('model').value.trim(),
+          saiz: document.getElementById('saiz').value.trim(),
+          harga: parseFloat(document.getElementById('harga').value) || 0,
+          stok: parseInt(document.getElementById('stok').value) || 0,
+          vendor_id: vendorId ? parseInt(vendorId) : null
+        };
+        kasut.push(newKasut);
+        kkSet(DB_KEYS.kasut, kasut);
+        kkShowFlash('Jenis kasut berjaya ditambah.', 'success');
+        e.target.reset();
+        renderTable();
+      });
+
+      isiVendorDropdown();
+      renderTable();
+    }
+  </script>
+</body>
+</html>

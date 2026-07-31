@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Sistem Pembelian Kasut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Ringkasan keseluruhan sistem pembelian kasut</p>
+        </div>
+      </div>
+
+      <div class="data-note">
+        💾 Semua data sistem ini disimpan dalam <strong>localStorage</strong> pelayar anda (tiada server/pangkalan data). Data akan kekal walaupun refresh, tetapi hanya wujud pada pelayar &amp; peranti ini.
+        <button type="button" id="btnReset" class="btn ghost small" style="margin-left:10px;">↺ Reset ke Data Contoh</button>
+      </div>
+
+      <div class="stat-grid" id="statGrid"></div>
+
+      <div class="panel">
+        <h2>Transaksi Terkini</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Customer</th><th>Kasut</th><th>Kuantiti</th><th>Jumlah</th><th>Bayaran</th><th>Staff</th><th>Tarikh</th></tr>
+          </thead>
+          <tbody id="tblTransaksi"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    const session = kkRequireLogin();
+    if (session) {
+      kkRenderSidebar('dashboard');
+
+      document.getElementById('btnReset').addEventListener('click', function () {
+        if (!confirm('Reset semua data kepada data contoh asal? Semua perubahan akan hilang.')) return;
+        kkResetData();
+        window.location.reload();
+      });
+
+      const customer = kkGet(DB_KEYS.customer);
+      const kasut = kkGet(DB_KEYS.kasut);
+      const vendor = kkGet(DB_KEYS.vendor);
+      const staff = kkGet(DB_KEYS.staff);
+      const pembelian = kkGet(DB_KEYS.pembelian).sort((a, b) => b.id - a.id);
+      const jumlahJualan = pembelian.reduce((sum, p) => sum + p.jumlah, 0);
+
+      document.getElementById('statGrid').innerHTML = `
+        <div class="stat-card"><div class="label">Jumlah Customer</div><div class="value">${customer.length}</div></div>
+        <div class="stat-card"><div class="label">Jenis Kasut</div><div class="value">${kasut.length}</div></div>
+        <div class="stat-card"><div class="label">Vendor Berdaftar</div><div class="value">${vendor.length}</div></div>
+        <div class="stat-card accent"><div class="label">Jumlah Transaksi</div><div class="value">${pembelian.length}</div></div>
+        <div class="stat-card accent"><div class="label">Jumlah Jualan (RM)</div><div class="value">${kkFormatRM(jumlahJualan)}</div></div>
+      `;
+
+      const tbody = document.getElementById('tblTransaksi');
+      const terkini = pembelian.slice(0, 5);
+      if (terkini.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--grey);padding:20px;">Belum ada transaksi.</td></tr>`;
+      } else {
+        tbody.innerHTML = terkini.map(t => {
+          const c = customer.find(x => x.id === t.customer_id) || {};
+          const k = kasut.find(x => x.id === t.kasut_id) || {};
+          const s = staff.find(x => x.id === t.staff_id) || {};
+          return `<tr>
+            <td>#${t.id}</td>
+            <td>${kkEscape(c.nama)}</td>
+            <td>${kkEscape(k.brand)} ${kkEscape(k.model)} (Saiz ${kkEscape(k.saiz)})</td>
+            <td>${t.kuantiti}</td>
+            <td>${kkFormatRM(t.jumlah)}</td>
+            <td>${kkEscape(t.kaedah_bayaran)}</td>
+            <td>${kkEscape(s.nama)}</td>
+            <td>${kkFormatTarikh(t.tarikh)}</td>
+          </tr>`;
+        }).join('');
+      }
+    }
+  </script>
+</body>
+</html>
