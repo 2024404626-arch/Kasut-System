@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ms">
+<%- include('partials/head') %>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar') %>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Senarai Vendor</h1>
+          <p>Urus maklumat pembekal kasut</p>
+        </div>
+      </div>
+
+      <%- include('partials/flash') %>
+
+      <div class="panel">
+        <h2>Tambah Vendor Baharu</h2>
+        <form action="/vendors" method="POST" class="form-grid">
+          <div>
+            <label>Nama Vendor</label>
+            <input type="text" name="nama_vendor" placeholder="cth: Nike Malaysia Sdn Bhd" required />
+          </div>
+          <div>
+            <label>No. Telefon</label>
+            <input type="text" name="no_telefon" placeholder="03-1234 5678" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" name="email" placeholder="sales@vendor.com" />
+          </div>
+          <div>
+            <label>Alamat</label>
+            <input type="text" name="alamat" placeholder="Bandar, Negeri" />
+          </div>
+          <div>
+            <button type="submit" class="btn">+ Tambah Vendor</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Senarai Vendor (<%= vendors.length %>)</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Nama Vendor</th><th>No. Telefon</th><th>Email</th><th>Alamat</th><th>Bilangan Kasut</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody>
+            <% if (vendors.length === 0) { %>
+              <tr><td colspan="7" style="text-align:center;color:var(--grey);padding:20px;">Tiada vendor lagi.</td></tr>
+            <% } %>
+            <% vendors.forEach(v => { %>
+              <tr>
+                <td>#<%= v.id %></td>
+                <td><%= v.nama_vendor %></td>
+                <td><%= v.no_telefon || '-' %></td>
+                <td><%= v.email || '-' %></td>
+                <td><%= v.alamat || '-' %></td>
+                <td><span class="badge"><%= v.jumlah_kasut %> jenis</span></td>
+                <td class="actions">
+                  <form action="/vendors/<%= v.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Padam vendor ini?');">
+                    <button type="submit" class="btn danger">Padam</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

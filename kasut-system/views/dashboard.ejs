@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ms">
+<%- include('partials/head') %>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar') %>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Ringkasan keseluruhan sistem pembelian kasut</p>
+        </div>
+      </div>
+
+      <%- include('partials/flash') %>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Jumlah Customer</div><div class="value"><%= jumlahCustomer %></div></div>
+        <div class="stat-card"><div class="label">Jenis Kasut</div><div class="value"><%= jumlahKasut %></div></div>
+        <div class="stat-card"><div class="label">Vendor Berdaftar</div><div class="value"><%= jumlahVendor %></div></div>
+        <div class="stat-card accent"><div class="label">Jumlah Transaksi</div><div class="value"><%= jumlahTransaksi %></div></div>
+        <div class="stat-card accent"><div class="label">Jumlah Jualan (RM)</div><div class="value">RM<%= jumlahJualan.toFixed(2) %></div></div>
+      </div>
+
+      <div class="panel">
+        <h2>Transaksi Terkini</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Customer</th><th>Kasut</th><th>Kuantiti</th><th>Jumlah</th><th>Bayaran</th><th>Staff</th><th>Tarikh</th></tr>
+          </thead>
+          <tbody>
+            <% if (transaksiTerkini.length === 0) { %>
+              <tr><td colspan="8" style="text-align:center;color:var(--grey);padding:20px;">Belum ada transaksi.</td></tr>
+            <% } %>
+            <% transaksiTerkini.forEach(t => { %>
+              <tr>
+                <td>#<%= t.id %></td>
+                <td><%= t.nama_customer %></td>
+                <td><%= t.brand %> <%= t.model %> (Saiz <%= t.saiz %>)</td>
+                <td><%= t.kuantiti %></td>
+                <td>RM<%= t.jumlah.toFixed(2) %></td>
+                <td><%= t.kaedah_bayaran %></td>
+                <td><%= t.nama_staff %></td>
+                <td><%= new Date(t.tarikh).toLocaleString('ms-MY') %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

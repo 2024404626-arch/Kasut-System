@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ms">
+<%- include('partials/head') %>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar') %>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Senarai Customer</h1>
+          <p>Urus maklumat pelanggan sistem</p>
+        </div>
+      </div>
+
+      <%- include('partials/flash') %>
+
+      <div class="panel">
+        <h2>Tambah Customer Baharu</h2>
+        <form action="/customers" method="POST" class="form-grid">
+          <div>
+            <label>Nama Penuh</label>
+            <input type="text" name="nama" placeholder="cth: Ali bin Ahmad" required />
+          </div>
+          <div>
+            <label>No. Telefon</label>
+            <input type="text" name="no_telefon" placeholder="012-3456789" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" name="email" placeholder="nama@email.com" />
+          </div>
+          <div>
+            <label>Alamat</label>
+            <input type="text" name="alamat" placeholder="Bandar, Negeri" />
+          </div>
+          <div>
+            <button type="submit" class="btn">+ Tambah Customer</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Senarai Customer (<%= customers.length %>)</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Nama</th><th>No. Telefon</th><th>Email</th><th>Alamat</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody>
+            <% if (customers.length === 0) { %>
+              <tr><td colspan="6" style="text-align:center;color:var(--grey);padding:20px;">Tiada customer lagi.</td></tr>
+            <% } %>
+            <% customers.forEach(c => { %>
+              <tr>
+                <td>#<%= c.id %></td>
+                <td><%= c.nama %></td>
+                <td><%= c.no_telefon || '-' %></td>
+                <td><%= c.email || '-' %></td>
+                <td><%= c.alamat || '-' %></td>
+                <td class="actions">
+                  <form action="/customers/<%= c.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Padam customer ini?');">
+                    <button type="submit" class="btn danger">Padam</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

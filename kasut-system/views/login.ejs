@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ms">
+<%- include('partials/head') %>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="icon">👟</div>
+        <h1>KasutKita</h1>
+      </div>
+      <p class="sub">Log masuk staff untuk mengurus sistem pembelian kasut</p>
+
+      <%- include('partials/flash') %>
+
+      <form action="/login" method="POST">
+        <div style="margin-bottom:16px;">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="cth: admin" required autofocus />
+        </div>
+        <div style="margin-bottom:20px;">
+          <label for="password">Kata Laluan</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn" style="width:100%;">Log Masuk</button>
+      </form>
+
+      <div class="login-hint">
+        <strong>Akaun contoh:</strong><br />
+        Username: <code>admin</code> · Kata laluan: <code>admin123</code><br />
+        Username: <code>siti</code> · Kata laluan: <code>siti123</code>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

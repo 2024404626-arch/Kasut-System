@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ms">
+<%- include('partials/head') %>
+<body>
+  <div class="app-shell">
+    <%- include('partials/sidebar') %>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Proses Pembayaran</h1>
+          <p>Pilih customer dan kasut untuk membuat transaksi pembelian</p>
+        </div>
+      </div>
+
+      <%- include('partials/flash') %>
+
+      <div class="panel">
+        <h2>Transaksi Baharu</h2>
+        <form action="/pembelian" method="POST" class="form-grid">
+          <div>
+            <label>Customer</label>
+            <select name="customer_id" required>
+              <option value="">- Pilih Customer -</option>
+              <% customers.forEach(c => { %>
+                <option value="<%= c.id %>"><%= c.nama %> (<%= c.no_telefon || 'tiada no.' %>)</option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label>Kasut</label>
+            <select name="kasut_id" required>
+              <option value="">- Pilih Kasut -</option>
+              <% kasut.forEach(k => { %>
+                <option value="<%= k.id %>">
+                  <%= k.brand %> <%= k.model %> · Saiz <%= k.saiz %> · RM<%= k.harga.toFixed(2) %> (Stok: <%= k.stok %>)
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label>Kuantiti</label>
+            <input type="number" name="kuantiti" min="1" value="1" required />
+          </div>
+          <div>
+            <label>Kaedah Bayaran</label>
+            <select name="kaedah_bayaran" required>
+              <option value="Tunai">Tunai</option>
+              <option value="Kad Debit">Kad Debit</option>
+              <option value="Kad Kredit">Kad Kredit</option>
+              <option value="E-Wallet">E-Wallet (TnG / Boost / GrabPay)</option>
+              <option value="Perbankan Online">Perbankan Online</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn">💳 Proses Pembayaran</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Sejarah Transaksi (<%= transaksi.length %>)</h2>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Customer</th><th>Kasut</th><th>Kuantiti</th><th>Jumlah</th><th>Bayaran</th><th>Staff</th><th>Tarikh</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% if (transaksi.length === 0) { %>
+              <tr><td colspan="9" style="text-align:center;color:var(--grey);padding:20px;">Belum ada transaksi.</td></tr>
+            <% } %>
+            <% transaksi.forEach(t => { %>
+              <tr>
+                <td>#<%= t.id %></td>
+                <td><%= t.nama_customer %></td>
+                <td><%= t.brand %> <%= t.model %> (Saiz <%= t.saiz %>)</td>
+                <td><%= t.kuantiti %></td>
+                <td>RM<%= t.jumlah.toFixed(2) %></td>
+                <td><%= t.kaedah_bayaran %></td>
+                <td><%= t.nama_staff %></td>
+                <td><%= new Date(t.tarikh).toLocaleString('ms-MY') %></td>
+                <td><a href="/pembelian/resit/<%= t.id %>" class="btn ghost small">Lihat Resit</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
